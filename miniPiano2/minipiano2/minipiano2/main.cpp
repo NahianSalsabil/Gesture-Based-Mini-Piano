@@ -6,6 +6,7 @@
  */ 
 
 #ifndef F_CPU
+
 #define F_CPU 1000000UL // 16 MHz clock speed
 #endif
 #define D4 eS_PORTD4
