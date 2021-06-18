@@ -16,6 +16,12 @@
 #define RS eS_PORTD2
 #define EN eS_PORTD3
 
+#define __DELAY_BACKWARD_COMPATIBLE__
+
+#define SPEAKER_PORT PORTC
+#define SPEAKER_DDR DDRC
+#define SPEAKER_PIN 7
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdlib.h>
@@ -69,6 +75,7 @@ void playnote12(int octave)
 {
 	//float frequency=524;
 }
+void PLAYNOTE(float duration, float frequency);
 
 int main(void)
 {
@@ -83,6 +90,15 @@ int main(void)
 	
 	while (1)
 	{
+		DDRA = 0x00;
+		if(PINA & (1 << 1)){
+			PLAYNOTE(400,880);  // Musical note 880 Hz
+		}
+		
+		if(PINA & (1 << 7)){
+			PLAYNOTE(400,1660);  // Musical note 1660 Hz
+		}
+		
 		ir_input_A = PINA;
 		ir_input_B = PINB;
 		
@@ -218,4 +234,47 @@ int main(void)
 	}
 				
 
+}
+ // ---------------------------------------
+ // The PLAYNOTE function must be given the
+ // duration, and frequency values.
+ // The duration is how long the note
+ // is played for. The frequency value
+ // determines the musical note.
+ // ---------------------------------------
+void PLAYNOTE(float duration, float frequency)
+{
+	// Physics variables
+	long int i,cycles;
+	float half_period;
+	float wavelength;
+
+	wavelength=(1/frequency)*1000;
+	// Standard physics formula.
+	cycles=duration/wavelength;
+	// The number of cycles.
+	half_period = wavelength/2;
+	// The time between each toggle.
+
+	// Data direction register Pin 7
+	// is set for output.
+	SPEAKER_DDR |= (1 << SPEAKER_PIN);
+
+	for (i=0;i<cycles;i++)
+	{
+		// The output pin 7 is toggled
+		// for the 'cycles'number of times.
+		// --------------------------------
+
+		_delay_ms(half_period);
+		// Wait 1 half wavelength.
+		SPEAKER_PORT |= (1 << SPEAKER_PIN);
+		// Output 5 V to port Pin 7.
+		_delay_ms(half_period);
+		// Wait 1 half wavelength.
+		SPEAKER_PORT &= ~(1 << SPEAKER_PIN);
+		// 0 V at port pin 7.
+	}
+	return;
+	// Return to main()
 }
