@@ -19,13 +19,62 @@
 #include <util/delay.h>
 #include <stdlib.h>
 #include "lcd.h"
+volatile int cur_octave=1;
+void playnote1(int octave)
+{
+	//float frequency=524;
+}
+void playnote2(int octave)
+{
+	//float frequency=524;
+}
+void playnote3(int octave)
+{
+	//float frequency=524;
+}
+void playnote4(int octave)
+{
+	//float frequency=524;
+}
+void playnote5(int octave)
+{
+	//float frequency=524;
+}
+void playnote6(int octave)
+{
+	//float frequency=524;
+}
+void playnote7(int octave)
+{
+	//float frequency=524;
+}
+void playnote8(int octave)
+{
+	//float frequency=524;
+}
+void playnote9(int octave)
+{
+	//float frequency=524;
+}
+void playnote10(int octave)
+{
+	//float frequency=524;
+}
+void playnote11(int octave)
+{
+	//float frequency=524;
+}
+void playnote12(int octave)
+{
+	//float frequency=524;
+}
 
 int main(void)
 {
 	/* Replace with your application code */
 	DDRA=0x00;
+	DDRB=0x0F;
 	DDRD=0xFF;
-	
 	Lcd4_Init();
 	
 	int ir_input_A, ir_input_B;
@@ -39,6 +88,58 @@ int main(void)
 		PORTD = 0x00;
 		str[0] = '0';
 		str[1] = '0';	
+		if((PINA & 1))
+		{
+			playnote1(cur_octave);
+			PORTD=0b00000001;
+		}
+		else if(PINA & (1<<1))
+		{
+			playnote2(cur_octave);
+			PORTD=0b00000011;
+		}
+		else if(PINA & (1<<2))
+		{
+			playnote3(cur_octave);
+			PORTD=0b00000001;
+		}
+		else if(PINA & (1<<3))
+		{
+			playnote4(cur_octave);
+			PORTD=0b00000011;
+		}
+		else if(PINA & (1<<4))
+		{
+			playnote5(cur_octave);
+		}
+		else if(PINA & (1<<5))
+		{
+			playnote6(cur_octave);
+		}
+		else if(PINA & (1<<6))
+		{
+			playnote7(cur_octave);
+		}
+		else if(PINA & (1<<7))
+		{
+			playnote8(cur_octave);
+		}
+		else if(PINB & 1)
+		{
+			playnote9(cur_octave);
+		}
+		else if (PINB & (1<<1))
+		{
+			playnote10(cur_octave);
+		}
+		else if (PINB & (1<<2))
+		{
+			playnote11(cur_octave);
+		}
+		else if (PINB & (1<<3))
+		{
+			playnote12(cur_octave);
+		}
 		
 		if(ir_input_A != 0){
 			switch(ir_input_A){
@@ -114,6 +215,8 @@ int main(void)
 		Lcd4_Set_Cursor(1,1);
 		Lcd4_Write_String(str);
 	}
+				
+
 }
 
 
