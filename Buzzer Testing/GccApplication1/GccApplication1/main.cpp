@@ -14,54 +14,86 @@
 #define SPEAKER_DDR DDRC
 #define SPEAKER_PIN 7
 // My Prototype is simply called PLAYNOTE.
-void PLAYNOTE(float duration, float frequency);
-void PLAYNOTE_ONE(float duration, float frequency);
+//void PLAYNOTE_with_duration(float duration, float frequency);
+void PLAYNOTE(float frequency);
+//void PLAYNOTE_ONE(float duration, float frequency);
 
 int main(void)
 {
 	DDRA = 0x00;
 	while(1){
 		if(PINA & 1){
-			PLAYNOTE(10,524);  // Musical note 880 Hz
+			PLAYNOTE(524);  // Musical note 880 Hz
 		}
 		else if(PINA & (1 << 1)){
-			PLAYNOTE(10,880);  // Musical note 988 Hz
+			PLAYNOTE(880);  // Musical note 988 Hz
 		}
 		else if(PINA & (1 << 2)){
-			PLAYNOTE(10,988);  // Musical note 988 Hz
+			PLAYNOTE(988);  // Musical note 988 Hz
 		}
 		else if(PINA & (1 << 3)){
-			PLAYNOTE(10,1047);  // Musical note 1047 Hz
+			PLAYNOTE(1047);  // Musical note 1047 Hz
 		}
 		else if(PINA & (1 << 4)){
-			PLAYNOTE(10,1109);  // Musical note 1660 Hz
+			PLAYNOTE(1109);  // Musical note 1660 Hz
 		}
 		else if(PINA & (1 << 5)){
-			PLAYNOTE(10,1175);  // Musical note 1660 Hz
+			PLAYNOTE(1175);  // Musical note 1660 Hz
 		}
 		else if(PINA & (1 << 6)){
-			PLAYNOTE(10,1244);  // Musical note 1660 Hz
+			PLAYNOTE(1244);  // Musical note 1660 Hz
 		}
 		
 		else if(PINA & (1 << 7)){
-			PLAYNOTE(10,1319);  // Musical note 1660 Hz
+			PLAYNOTE(1319);  // Musical note 1660 Hz
 		}
 		else if(PINB & 1){
-			PLAYNOTE(10,1397);  // Musical note 1660 Hz
+			PLAYNOTE(1397);  // Musical note 1660 Hz
 		}
 		else if(PINB & (1 << 1)){
-			PLAYNOTE(10,1480);  // Musical note 1660 Hz
+			PLAYNOTE(1480);  // Musical note 1660 Hz
 		}
 		else if(PINB & (1 << 2)){
-			PLAYNOTE(10,1568);  // Musical note 1660 Hz
+			PLAYNOTE(1568);  // Musical note 1660 Hz
 		}
 		else if(PINB & (1 << 3)){
-			PLAYNOTE(10,1048);  // Musical note 1660 Hz
+			PLAYNOTE(1048);  // Musical note 1660 Hz
 		}
 		
 		
 	}
 
+
+}
+
+void PLAYNOTE( float frequency)
+{
+	// Physics variables
+	//long int i;
+	float half_period;
+	float wavelength;
+
+	wavelength=(1/frequency)*1000;
+	// Standard physics formula.
+	half_period = wavelength/2;
+	// The time between each toggle.
+
+	// Data direction register Pin 7
+	// is set for output.
+	SPEAKER_DDR |= (1 << SPEAKER_PIN);
+
+	
+
+	_delay_ms(half_period);
+	// Wait 1 half wavelength.
+	SPEAKER_PORT |= (1 << SPEAKER_PIN);
+	// Output 5 V to port Pin 7.
+	_delay_ms(half_period);
+	// Wait 1 half wavelength.
+	SPEAKER_PORT &= ~(1 << SPEAKER_PIN);
+	// 0 V at port pin 7.
+
+	return;
 
 }
 
@@ -76,7 +108,7 @@ int main(void)
 // ---------------------------------------
 
 
-void PLAYNOTE(float duration, float frequency)
+/*void PLAYNOTE_with_duration(float duration, float frequency)
 {
 // Physics variables
 	long int i,cycles;
@@ -111,5 +143,5 @@ void PLAYNOTE(float duration, float frequency)
 	}
 	return;
 	// Return to main()
-}
+}*/
 
