@@ -65,20 +65,77 @@ int main(void)
 {
 	/* Replace with your application code */
 	DDRA=0x00;
-	
+	DDRB=0x00;
 	DDRC=0xFF;
+	DDRD=0xFF;
 	
 
 	while (1)
 	{
 		if((PINA & 1))
 		{
-			//playnote1(cur_octave);
 			PORTC=0b00000001;
+			PORTD=0b00000000;
 		}
+		else if((PINA & 0b00000010))
+		{
+			PORTC=0b00000010;
+			PORTD=0b00000000;
+		}
+		else if((PINA & 0b00000100))
+		{
+			PORTC=0b00000100;
+			PORTD=0b00000000;
+		}
+		else if((PINA & 0b00001000))
+		{
+			PORTC=0b00001000;
+			PORTD=0b00000000;
+		}	
+		else if((PINA & 0b00010000))
+		{
+			PORTC=0b00010000;
+			PORTD=0b00000000;
+		}
+		else if((PINA & 0b00100000))
+		{
+			PORTC=0b00100000;
+			PORTD=0b00000000;
+		}	
+		else if((PINA & 0b01000000))
+		{
+			PORTC=0b01000000;
+			PORTD=0b00000000;
+		}	
+		else if((PINA & 0b10000000))
+		{
+			PORTC=0b10000000;
+			PORTD=0b00000000;
+		}		
+		else if((PINB & 0b00000001))
+		{
+			PORTC=0b00000000;
+			PORTD=0b00000001;
+		}
+		else if((PINB & 0b00000010))
+		{
+			PORTC=0b00000000;
+			PORTD=0b00000010;
+		}
+		else if((PINB & 0b00000100))
+		{
+			PORTC=0b00000000;
+			PORTD=0b00000100;
+		}
+		else if((PINB & 0b00001000))
+		{
+			PORTC=0b00000000;
+			PORTD=0b00001000;
+		}			
 		else
 		{
 			PORTC=0b00000000;
+			PORTD=0b00000000;
 		}
 		
 		
