@@ -72,70 +72,70 @@ int main(void)
 
 	while (1)
 	{
-		if((PINA & 1))
+		if((PINA & 0b00000001)==0x00)
 		{
 			PORTC=0b00000001;
 			PORTD=0b00000000;
 		}
-		else if((PINA & 0b00000010))
+		else if((PINA & 0b00000010)==0x00)
 		{
 			PORTC=0b00000010;
 			PORTD=0b00000000;
 		}
-		else if((PINA & 0b00000100))
+		else if((PINA & 0b00000100)==0x00)
 		{
 			PORTC=0b00000100;
 			PORTD=0b00000000;
 		}
-		else if((PINA & 0b00001000))
+		else if((PINA & 0b00001000)==0x00)
 		{
 			PORTC=0b00001000;
 			PORTD=0b00000000;
 		}	
-		else if((PINA & 0b00010000))
+		else if((PINA & 0b00010000)==0x00)
 		{
 			PORTC=0b00010000;
 			PORTD=0b00000000;
 		}
-		else if((PINA & 0b00100000))
+		else if((PINA & 0b00100000)==0x00)
 		{
 			PORTC=0b00100000;
 			PORTD=0b00000000;
 		}	
-		else if((PINA & 0b01000000))
+		else if((PINA & 0b01000000)==0x00)
 		{
 			PORTC=0b01000000;
 			PORTD=0b00000000;
 		}	
-		else if((PINA & 0b10000000))
+		else if((PINA & 0b10000000)==0x00)
 		{
 			PORTC=0b10000000;
 			PORTD=0b00000000;
 		}		
-		else if((PINB & 0b00000001))
+		else if((PINB & 0b00000001)==0x00)
 		{
 			PORTC=0b00000000;
 			PORTD=0b00000001;
 		}
-		else if((PINB & 0b00000010))
+		else if((PINB & 0b00000010)==0x00)
 		{
 			PORTC=0b00000000;
 			PORTD=0b00000010;
 		}
-		else if((PINB & 0b00000100))
+		else if((PINB & 0b00000100)==0x00)
 		{
 			PORTC=0b00000000;
 			PORTD=0b00000100;
 		}
-		else if((PINB & 0b00001000))
+		else if((PINB & 0b00001000)==0x00)
 		{
 			PORTC=0b00000000;
 			PORTD=0b00001000;
 		}			
 		else
 		{
-			PORTC=0b00000000;
-			PORTD=0b00000000;
+			PORTC=0x00;
+			PORTD=0x00;
 		}
 		
 		
