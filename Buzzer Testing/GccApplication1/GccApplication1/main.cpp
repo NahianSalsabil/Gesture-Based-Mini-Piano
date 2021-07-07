@@ -21,6 +21,7 @@ void PLAYNOTE(float frequency);
 int main(void)
 {
 	DDRA = 0x00;
+	//DDRC = 0x00;
 	while(1){
 		if(PINA & 1){
 			PLAYNOTE(524);  // Musical note 880 Hz
@@ -59,7 +60,10 @@ int main(void)
 		else if(PINB & (1 << 3)){
 			PLAYNOTE(1048);  // Musical note 1660 Hz
 		}
-		
+		else
+		{
+			SPEAKER_PORT=0x00;
+		}
 		
 	}
 
