@@ -126,6 +126,7 @@ void PLAYNOTE( float frequency)
 int main(void)
 {
 	/* Replace with your application code */
+	mode=0b00000000; //init to normal playing mode
 	DDRA=0x00;
 	DDRB=0x00;
 	DDRD=0b11111000;
