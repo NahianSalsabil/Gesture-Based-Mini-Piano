@@ -128,7 +128,7 @@ int main(void)
 	/* Replace with your application code */
 	DDRA=0x00;
 	DDRB=0x00;
-	DDRD=0b11111011;
+	DDRD=0b11111000;
 	
 	int playlist[tot_playlist_size]; // array to keep each tunes end address, address starts from 0
 	int i=0;
@@ -238,6 +238,18 @@ int main(void)
 				_delay_ms(1000);
 			}
 			
+			//play prev and next
+			if(PIND & 1)
+			{
+				play_prev();
+				_delay_ms(1000);
+			}
+			else if(PIND & (1<<1))
+			{
+				play_next();
+				_delay_ms(1000);
+			}
+			
 			
 		}
 		else //record play
@@ -256,8 +268,8 @@ int main(void)
 				int endd=playlist[curr_playing];//ending of saved tune
 
 				
-				int eep_note; // note to play (numbering 1-13)
-				int iter_note; // how many iterations of that note will be played
+				int eep_note=0; // note to play (numbering 1-13)
+				int iter_note=0; // how many iterations of that note will be played
 				
 				//read eeprom from address start to end
 				int iter_read;
@@ -269,14 +281,118 @@ int main(void)
 					//set iteration number
 				}
 				
+				int iter;
 				if(eep_note==1)
 				{
-					
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note1);
+					}
 				}
 				else if (eep_note==2)
 				{
-					
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note2);
+					}	
 				}
+				else if (eep_note==3)
+				{
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note3);
+					}
+				}
+				else if (eep_note==4)
+				{
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note4);
+					}
+				}
+				else if (eep_note==5)
+				{
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note5);
+					}
+				}
+				else if (eep_note==6)
+				{
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note6);
+					}
+				}
+				else if (eep_note==7)
+				{
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note7);
+					}
+				}
+				else if (eep_note==8)
+				{
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note8);
+					}
+				}
+				else if (eep_note==9)
+				{
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note9);
+					}
+				}
+				else if (eep_note==10)
+				{
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note10);
+					}
+				}
+				else if (eep_note==11)
+				{
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note11);
+					}
+				}
+				else if (eep_note==12)
+				{
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						PLAYNOTE(note12);
+					}
+				}
+				else if (eep_note==13)
+				{
+					iter=0;
+					for(iter=0;iter<iter_note;iter++)
+					{
+						//silence
+						PORTC=0x00;
+					}
+				}
+				
+				//toggle mode to normal play after playing
+				if(iter_read==endd)
+				{
+					mode=~mode;
+				}	
 				
 			}
 			
