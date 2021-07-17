@@ -56,6 +56,7 @@
 #include <avr/interrupt.h>
 #include "lcd.h"
 #include "24c64.h"
+#include "24c64.c"
 
 volatile unsigned char octave = 1;
 volatile unsigned char mode = 0x00; //mode 0 for normal piano play, mode 1 for record play
@@ -77,6 +78,7 @@ ISR(INT2_vect){
 		playlist[current_tune_index] = octave;
 		playlist[current_tune_index+1] = end_address_of_tune;
 		current_tune_index = current_tune_index + 2;
+		tot_saved_tunes++;
 		recording = 0;   //recording mode off
 	}
 	else recording = 1;   //recording mode on
@@ -514,10 +516,11 @@ int main(void)
 				}
 				else
 				{
-					start=playlist[curr_playing-1]+1;
+					start=playlist[((curr_playing-1)*2)+1]+1;
 				}
-				int endd=playlist[curr_playing];//ending of saved tune
+				int endd=playlist[(curr_playing*2)+1];//ending of saved tune
 
+				int play_octave=playlist[(curr_playing*2)];
 				
 				int eep_note=0; // note to play (numbering 1-13)
 				int iter_note=0; // how many iterations of that note will be played
@@ -538,7 +541,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note1);
+						PLAYNOTE(note1*play_octave);
 					}
 				}
 				else if (eep_note==2)
@@ -546,7 +549,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note2);
+						PLAYNOTE(note2*play_octave);
 					}	
 				}
 				else if (eep_note==3)
@@ -554,7 +557,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note3);
+						PLAYNOTE(note3*play_octave);
 					}
 				}
 				else if (eep_note==4)
@@ -562,7 +565,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note4);
+						PLAYNOTE(note4*play_octave);
 					}
 				}
 				else if (eep_note==5)
@@ -570,7 +573,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note5);
+						PLAYNOTE(note5*play_octave);
 					}
 				}
 				else if (eep_note==6)
@@ -578,7 +581,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note6);
+						PLAYNOTE(note6*play_octave);
 					}
 				}
 				else if (eep_note==7)
@@ -586,7 +589,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note7);
+						PLAYNOTE(note7*play_octave);
 					}
 				}
 				else if (eep_note==8)
@@ -594,7 +597,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note8);
+						PLAYNOTE(note8*play_octave);
 					}
 				}
 				else if (eep_note==9)
@@ -602,7 +605,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note9);
+						PLAYNOTE(note9*play_octave);
 					}
 				}
 				else if (eep_note==10)
@@ -610,7 +613,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note10);
+						PLAYNOTE(note10*play_octave);
 					}
 				}
 				else if (eep_note==11)
@@ -618,7 +621,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note11);
+						PLAYNOTE(note11*play_octave);
 					}
 				}
 				else if (eep_note==12)
@@ -626,7 +629,7 @@ int main(void)
 					iter=0;
 					for(iter=0;iter<iter_note;iter++)
 					{
-						PLAYNOTE(note12);
+						PLAYNOTE(note12*play_octave);
 					}
 				}
 				else if (eep_note==13)
