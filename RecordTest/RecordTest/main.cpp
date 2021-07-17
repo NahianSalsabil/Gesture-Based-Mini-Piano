@@ -205,8 +205,8 @@ int main(void)
 						EEWriteByte(address,1);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 						
 					}
 					
@@ -242,11 +242,11 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,1);
+						EEWriteByte(address,2);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 						
 					}
 					
@@ -270,11 +270,11 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,1);
+						EEWriteByte(address,3);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 					}
 					
 					previous_note = current_note;
@@ -297,11 +297,11 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,1);
+						EEWriteByte(address,4);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 					}
 					
 					previous_note = current_note;
@@ -324,11 +324,11 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,1);
+						EEWriteByte(address,5);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 					}
 					
 					previous_note = current_note;
@@ -351,11 +351,11 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,1);
+						EEWriteByte(address,6);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 					}
 					
 					previous_note = current_note;
@@ -378,11 +378,11 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,1);
+						EEWriteByte(address,7);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 					}
 					
 					previous_note = current_note;
@@ -405,11 +405,11 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,1);
+						EEWriteByte(address,8);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 					}
 					
 					previous_note = current_note;
@@ -432,11 +432,11 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,1);
+						EEWriteByte(address,9);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 					}
 					
 					previous_note = current_note;
@@ -459,11 +459,11 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,1);
+						EEWriteByte(address,10);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 					}
 					
 					previous_note = current_note;
@@ -486,11 +486,11 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,1);
+						EEWriteByte(address,11);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 					}
 					
 					previous_note = current_note;
@@ -513,11 +513,11 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,1);
+						EEWriteByte(address,12);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						address = address + 2;
-						end_address_of_tune = address;
+						address = address + 3;
+						end_address_of_tune = address - 1;
 					}
 					
 					previous_note = current_note;
@@ -540,8 +540,14 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
+						EEWriteByte(address,13);
+						EEWriteByte(address+1,lower_part);
+						EEWriteByte(address+2,upper_part);
+						address = address + 3;
+						end_address_of_tune = address - 1;
+						
 					}
-					Lcd4_Set_Cursor(1,1);
+					/*Lcd4_Set_Cursor(1,1);
 					dtostrf(lower_part,4,0,outstr);
 					Lcd4_Write_String(outstr);
 					Lcd4_Set_Cursor(1,6);
@@ -552,10 +558,10 @@ int main(void)
 					Lcd4_Write_String(outstr);
 					_delay_ms(2000);
 					previous_note = current_note;
-					duration_count = 1;
+					duration_count = 1;*/
 				}
 				else{
-					Lcd4_Clear();
+					//Lcd4_Clear();
 					duration_count = duration_count + 1;
 				}
 				//PORTD=0x00;
@@ -608,123 +614,133 @@ int main(void)
 				
 				int eep_note=0; // note to play (numbering 1-13)
 				int iter_note=0; // how many iterations of that note will be played
-				
+				uint8_t play_note_number;
+				uint8_t play_lower_part;
+				uint8_t play_upper_part;
 				//read eeprom from address start to end
 				int iter_read;
-				for(iter_read = start ; iter_read <= endd ; iter_read++)
+				for(iter_read = start ; iter_read <= endd ; iter_read+=3)
 				{
 					//read from eeprom
+					play_note_number = EEReadByte(iter_read);
+					play_lower_part = EEReadByte(iter_read+1);
+					play_upper_part = EEReadByte(iter_read+2);
 					//decode the saved info
+					iter_note = lower_part | (upper_part << 8);
 					//set eepnote
-					//set iteration number
+					eep_note = play_note_number;
+					
+					int iter;
+					if(eep_note==1)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note1*play_octave);
+						}
+					}
+					else if (eep_note==2)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note2*play_octave);
+						}
+					}
+					else if (eep_note==3)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note3*play_octave);
+						}
+					}
+					else if (eep_note==4)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note4*play_octave);
+						}
+					}
+					else if (eep_note==5)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note5*play_octave);
+						}
+					}
+					else if (eep_note==6)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note6*play_octave);
+						}
+					}
+					else if (eep_note==7)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note7*play_octave);
+						}
+					}
+					else if (eep_note==8)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note8*play_octave);
+						}
+					}
+					else if (eep_note==9)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note9*play_octave);
+						}
+					}
+					else if (eep_note==10)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note10*play_octave);
+						}
+					}
+					else if (eep_note==11)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note11*play_octave);
+						}
+					}
+					else if (eep_note==12)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							PLAYNOTE(note12*play_octave);
+						}
+					}
+					else if (eep_note==13)
+					{
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							//silence
+							PORTC=0x00;
+						}
+					}
+					
+					
 				}
 				
-				int iter;
-				if(eep_note==1)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note1*play_octave);
-					}
-				}
-				else if (eep_note==2)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note2*play_octave);
-					}	
-				}
-				else if (eep_note==3)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note3*play_octave);
-					}
-				}
-				else if (eep_note==4)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note4*play_octave);
-					}
-				}
-				else if (eep_note==5)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note5*play_octave);
-					}
-				}
-				else if (eep_note==6)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note6*play_octave);
-					}
-				}
-				else if (eep_note==7)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note7*play_octave);
-					}
-				}
-				else if (eep_note==8)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note8*play_octave);
-					}
-				}
-				else if (eep_note==9)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note9*play_octave);
-					}
-				}
-				else if (eep_note==10)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note10*play_octave);
-					}
-				}
-				else if (eep_note==11)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note11*play_octave);
-					}
-				}
-				else if (eep_note==12)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						PLAYNOTE(note12*play_octave);
-					}
-				}
-				else if (eep_note==13)
-				{
-					iter=0;
-					for(iter=0;iter<iter_note;iter++)
-					{
-						//silence
-						PORTC=0x00;
-					}
-				}
+				
 				
 				//toggle mode to normal play after playing
 				if(iter_read==endd)
