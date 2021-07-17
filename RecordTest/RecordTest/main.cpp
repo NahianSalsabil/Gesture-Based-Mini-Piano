@@ -56,6 +56,7 @@
 #include <avr/interrupt.h>
 #include "lcd.h"
 #include "24c64.h"
+#include "24c64.c"
 
 volatile unsigned char octave = 1;
 volatile unsigned char mode = 0x00; //mode 0 for normal piano play, mode 1 for record play
@@ -226,7 +227,7 @@ int main(void)
 					Lcd4_Clear();
 					duration_count = duration_count + 1;
 				}
-				PLAYNOTE(note12 * octave);
+				PLAYNOTE(note1 * octave);
 			}
 			else if((PINA & 0b00000010)==0x00)
 			{
@@ -254,7 +255,7 @@ int main(void)
 				else{
 					duration_count = duration_count + 1;
 				}
-				PLAYNOTE(587.3295 * octave);
+				PLAYNOTE(note2 * octave);
 			}
 			else if((PINA & 0b00000100)==0x00)
 			{
@@ -281,7 +282,7 @@ int main(void)
 				else{
 					duration_count++;
 				}
-				PLAYNOTE(659.2551 * octave);
+				PLAYNOTE(note3 * octave);
 			}
 			else if((PINA & 0b00001000)==0x00)
 			{
@@ -308,7 +309,7 @@ int main(void)
 				else{
 					duration_count++;
 				}
-				PLAYNOTE(698.4565 * octave);
+				PLAYNOTE(note4 * octave);
 			}	
 			else if((PINA & 0b00010000)==0x00)
 			{
@@ -335,7 +336,7 @@ int main(void)
 				else{
 					duration_count++;
 				}
-				PLAYNOTE(783.9909 * octave);
+				PLAYNOTE(note5 * octave);
 			}
 			else if((PINA & 0b00100000)==0x00)
 			{
@@ -362,7 +363,7 @@ int main(void)
 				else{
 					duration_count++;
 				}
-				PLAYNOTE(880.0000 * octave);
+				PLAYNOTE(note6 * octave);
 			}	
 			else if((PINA & 0b01000000)==0x00)
 			{
@@ -389,7 +390,7 @@ int main(void)
 				else{
 					duration_count++;
 				}
-				PLAYNOTE(987.7666 * octave);
+				PLAYNOTE(note7 * octave);
 			}	
 			else if((PINA & 0b10000000)==0x00)
 			{
@@ -416,31 +417,115 @@ int main(void)
 				else{
 					duration_count++;
 				}
-				PLAYNOTE(1068 * octave);
+				PLAYNOTE(note8 * octave);
 			}		
 			else if((PINB & 0b00000001)==0x00)
 			{
 				//PORTC=0b00000000;
 				//PORTD=0b00000001;
-				PLAYNOTE(1397 * octave);
+				current_note = 0b00001001;
+				if(previous_note != current_note){
+					if(recording){
+						lower_part = duration_count & 0x00FF;
+						upper_part = (duration_count & 0xFF00) >> 8;
+						//eeprom write
+						//write previous_note
+						//write count
+						EEWriteByte(address,1);
+						EEWriteByte(address+1,lower_part);
+						EEWriteByte(address+2,upper_part);
+						address = address + 2;
+						end_address_of_tune = address;
+					}
+					
+					previous_note = current_note;
+					duration_count = 1;
+				}
+				else{
+					duration_count++;
+				}
+				PLAYNOTE(note9 * octave);
 			}
 			else if((PINB & 0b00000010)==0x00)
 			{
 				//PORTC=0b00000000;
 				//PORTD=0b00000010;
-				PLAYNOTE(1480 * octave);
+				current_note = 0b00001010;
+				if(previous_note != current_note){
+					if(recording){
+						lower_part = duration_count & 0x00FF;
+						upper_part = (duration_count & 0xFF00) >> 8;
+						//eeprom write
+						//write previous_note
+						//write count
+						EEWriteByte(address,1);
+						EEWriteByte(address+1,lower_part);
+						EEWriteByte(address+2,upper_part);
+						address = address + 2;
+						end_address_of_tune = address;
+					}
+					
+					previous_note = current_note;
+					duration_count = 1;
+				}
+				else{
+					duration_count++;
+				}
+				PLAYNOTE(note10 * octave);
 			}
 			else if((PINB & 0b00000100)==0x00)
 			{
 				//PORTC=0b00000000;
 				//PORTD=0b00000100;
-				PLAYNOTE(1568 * octave);
+				current_note = 0b00001011;
+				if(previous_note != current_note){
+					if(recording){
+						lower_part = duration_count & 0x00FF;
+						upper_part = (duration_count & 0xFF00) >> 8;
+						//eeprom write
+						//write previous_note
+						//write count
+						EEWriteByte(address,1);
+						EEWriteByte(address+1,lower_part);
+						EEWriteByte(address+2,upper_part);
+						address = address + 2;
+						end_address_of_tune = address;
+					}
+					
+					previous_note = current_note;
+					duration_count = 1;
+				}
+				else{
+					duration_count++;
+				}
+				PLAYNOTE(note11 * octave);
 			}
 			else if((PINB & 0b00001000)==0x00)
 			{
 				//PORTC=0b00000000;
 				//PORTD=0b00001000;
-				PLAYNOTE(1630 * octave);
+				current_note = 0b00001100;
+				if(previous_note != current_note){
+					if(recording){
+						lower_part = duration_count & 0x00FF;
+						upper_part = (duration_count & 0xFF00) >> 8;
+						//eeprom write
+						//write previous_note
+						//write count
+						EEWriteByte(address,1);
+						EEWriteByte(address+1,lower_part);
+						EEWriteByte(address+2,upper_part);
+						address = address + 2;
+						end_address_of_tune = address;
+					}
+					
+					previous_note = current_note;
+					duration_count = 1;
+				}
+				else{
+					duration_count++;
+				}
+				PLAYNOTE(note12 * octave);
 			}			
 			else
 			{
