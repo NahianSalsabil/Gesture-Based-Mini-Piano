@@ -34,12 +34,12 @@
 #define note11 1568
 #define note12 1630    
 
-// #define D4 eS_PORTD4
-// #define D5 eS_PORTD5
-// #define D6 eS_PORTD6
-// #define D7 eS_PORTD7
-// #define RS eS_PORTC5
-// #define EN eS_PORTC6      
+#define D4 eS_PORTD4
+#define D5 eS_PORTD5
+#define D6 eS_PORTD6
+#define D7 eS_PORTD7
+#define RS eS_PORTC5
+#define EN eS_PORTC6      
 
 
 
@@ -54,7 +54,7 @@
 #include <util/delay.h>
 #include <stdlib.h>
 #include <avr/interrupt.h>
-//#include "lcd.h"
+#include "lcd.h"
 #include "24c64.h"
 #include "24c64.c"
 
@@ -66,8 +66,7 @@ volatile int tot_saved_tunes = 0;
 volatile int end_address_of_tune;
 volatile int recording = 0; //recording off
 volatile int playlist[tot_playlist_size]; // array to keep each tunes end address, address starts from 0
-volatile int low = 0;
-volatile int up = 0;
+
 
 ISR(INT0_vect)
 {
@@ -75,18 +74,14 @@ ISR(INT0_vect)
 }
 
 ISR(INT1_vect){
-	/*PORTD=PORTD  |  0x80;*/
-	if(recording==1){
+	if(recording){
 		playlist[current_tune_index] = octave;
 		playlist[current_tune_index+1] = end_address_of_tune;
 		current_tune_index = current_tune_index + 2;
 		tot_saved_tunes++;
 		recording = 0;   //recording mode off
 	}
-	else if(recording==0){
-		recording = 1;   //recording mode on
-		
-	}
+	else recording = 1;   //recording mode on
 }
 
 
@@ -159,15 +154,15 @@ int main(void)
 	mode=0b00000000; //init to normal playing mode
 	DDRA=0x00;
 	DDRB=0x00;
-	DDRD=0b11110000;
-	//DDRC = 0xFF;
+	DDRD=0b11111000;
+	DDRC = 0xFF;
 	
-	//Lcd4_Init();
+	Lcd4_Init();
 	int previous_note = 0x00;
 	int current_note = 0xFF;
-	unsigned int duration_count = 0;
-	unsigned int upper_part = 0;
-	unsigned int lower_part = 0;
+	int duration_count = 0x0000;
+	int upper_part = 0;
+	int lower_part = 0;
 	unsigned int address = 0;
 	
 	char outstr[20];
@@ -180,48 +175,51 @@ int main(void)
 	}
 	
 	GICR |= (1<<INT0); //interrupt
-	GICR |= (1<<INT1);
+	GICR |= (1<<INT2);
 	MCUCR = MCUCR | 0b00000011; //set MCUCR for falling edge
 	MCUCR = MCUCR | 0b00001100; //set MCUCR for falling edge
 	
 	sei(); //enable interrupt
 	
 	mode=0b00000000; //init to normal playing mode
-	recording=0;
 	
 	EEOpen();
 
 	while (1)
 	{
-		//Lcd4_Clear();
+		
 		if(!mode) //normal play
 		{
-
 			if((PINA & 0b00000001)==0x00)
 			{
 				//PORTC=0b00000001;
 				//PORTD=0b00000000;
-				PLAYNOTE(note1 * octave);
 				if(recording){
 					current_note = 0b00000001;
-					
 					if(previous_note != current_note){
-						upper_part = (duration_count & 0b1111111100000000) >> 8;
-						lower_part = duration_count & 0b0000000011111111;
-						
+						lower_part = duration_count & 0x00FF;
+						upper_part = (duration_count & 0xFF00) >> 8;
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						//_delay_ms(1000);
+						EEWriteByte(address,1);
 						EEWriteByte(address+1,lower_part);
-						//_delay_ms(1000);
 						EEWriteByte(address+2,upper_part);
- 						low = lower_part;
- 						up = upper_part;
-						//_delay_ms(1000);
 						address = address + 3;
 						end_address_of_tune = address - 1;
+						
+					
+					
+						/*Lcd4_Set_Cursor(1,1);
+						dtostrf(lower_part,4,0,outstr);
+						Lcd4_Write_String(outstr);
+						Lcd4_Set_Cursor(1,6);
+						dtostrf(upper_part,4,0,outstr);
+						Lcd4_Write_String(outstr);
+						Lcd4_Set_Cursor(2,1);
+						dtostrf(duration_count,8,0,outstr);
+						Lcd4_Write_String(outstr);
+						_delay_ms(2000);*/
 					
 						previous_note = current_note;
 						duration_count = 1;
@@ -231,14 +229,12 @@ int main(void)
 						duration_count = duration_count + 1;
 					}
 				}
-				
-				
+				PLAYNOTE(note1 * octave);
 			}
 			else if((PINA & 0b00000010)==0x00)
 			{
 				//PORTC=0b00000010;
 				//PORTD=0b00000000;
-				PLAYNOTE(note2 * octave);
 				if(recording){
 					current_note = 0b00000010;
 					if(previous_note != current_note){
@@ -247,7 +243,7 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						EEWriteByte(address,2);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
 						address = address + 3;
@@ -260,7 +256,7 @@ int main(void)
 						duration_count = duration_count + 1;
 					}
 				}
-				
+				PLAYNOTE(note2 * octave);
 			}
 			else if((PINA & 0b00000100)==0x00)
 			{
@@ -274,10 +270,9 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						EEWriteByte(address,3);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
 					
@@ -302,10 +297,9 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						EEWriteByte(address,4);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
 						previous_note = current_note;
@@ -329,10 +323,9 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						EEWriteByte(address,5);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
 					
@@ -358,10 +351,9 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						EEWriteByte(address,6);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
 						
@@ -386,10 +378,9 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						EEWriteByte(address,7);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
 					
@@ -414,10 +405,9 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						EEWriteByte(address,8);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
 					
@@ -442,10 +432,9 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						EEWriteByte(address,9);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
 					
@@ -470,10 +459,9 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						EEWriteByte(address,10);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
 					
@@ -486,7 +474,7 @@ int main(void)
 				}
 				PLAYNOTE(note10 * octave);
 			}
-			else if((PINB & 0b00001000)==0x00)
+			else if((PINB & 0b00000100)==0x00)
 			{
 				//PORTC=0b00000000;
 				//PORTD=0b00000100;
@@ -498,10 +486,9 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						EEWriteByte(address,11);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
 					
@@ -514,7 +501,7 @@ int main(void)
 				}
 				PLAYNOTE(note11 * octave);
 			}
-			else if((PINB & 0b00010000)==0x00)
+			else if((PINB & 0b00001000)==0x00)
 			{
 				//PORTC=0b00000000;
 				//PORTD=0b00001000;
@@ -526,10 +513,9 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						EEWriteByte(address,12);
 						EEWriteByte(address+1,lower_part);
 						EEWriteByte(address+2,upper_part);
-						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
 					
@@ -541,54 +527,41 @@ int main(void)
 					}
 				}
 				PLAYNOTE(note12 * octave);
-			}
+			}			
 			else
 			{
-				//PORTD=PORTD & 0b11101111;
-				PORTC &= 0b01111111;
-				
-				
+				PORTC=0x00;
 				if(recording){
-				current_note = 0b00001101;
-				if(previous_note != current_note){
-					
-						upper_part = (duration_count & 0b1111111100000000) >> 8;
-						lower_part = duration_count & 0b0000000011111111;
+					current_note = 0b00001101;
+					if(previous_note != current_note){
+						lower_part = duration_count & 0x00FF;
+						upper_part = (duration_count & 0xFF00) >> 8;
 						//eeprom write
 						//write previous_note
 						//write count
-// 						if(EEWriteByte(address,previous_note)==0)
-// 						{
-// 							PORTD|=0x01;
-// 						}
-// 						else
-// 						{
-// 							PORTD|=0x02;
-// 						}
-						EEWriteByte(address,previous_note);
-						//_delay_ms(1000);
+						EEWriteByte(address,13);
 						EEWriteByte(address+1,lower_part);
-						//_delay_ms(1000);
 						EEWriteByte(address+2,upper_part);
-						//_delay_ms(1000);
- 						low = lower_part;
- 						up = upper_part;
 						address = address + 3;
 						end_address_of_tune = address - 1;
-					
-
-					previous_note = current_note;
-					duration_count = 1;
+						/*Lcd4_Set_Cursor(1,1);
+						dtostrf(lower_part,4,0,outstr);
+						Lcd4_Write_String(outstr);
+						Lcd4_Set_Cursor(1,6);
+						dtostrf(upper_part,4,0,outstr);
+						Lcd4_Write_String(outstr);
+						Lcd4_Set_Cursor(2,1);
+						dtostrf(duration_count,8,0,outstr);
+						Lcd4_Write_String(outstr);
+						_delay_ms(2000);
+						previous_note = current_note;
+						duration_count = 1;*/
+					}
+					else{
+						//Lcd4_Clear();
+						duration_count = duration_count + 1;
+					}
 				}
-				
-				
-				else{
-					//Lcd4_Clear();
-					duration_count = duration_count + 1;
-				}
-				
-				}
-				
 				//PORTD=0x00;
 			}
 		
@@ -622,12 +595,8 @@ int main(void)
 		}
 		else //record play
 		{
-
 			if(tot_saved_tunes != 0) // atleast 1 saved tune
 			{
-
-					
-				
 				int start; //starting of saved tune
 				if(curr_playing==0)
 				{
@@ -642,7 +611,7 @@ int main(void)
 				int play_octave=playlist[(curr_playing*2)];
 				
 				int eep_note=0; // note to play (numbering 1-13)
-				uint16_t iter_note=0; // how many iterations of that note will be played
+				int iter_note=0; // how many iterations of that note will be played
 				uint8_t play_note_number;
 				uint8_t play_lower_part = 0;
 				uint8_t play_upper_part = 0;
@@ -654,21 +623,12 @@ int main(void)
 					play_note_number = EEReadByte(iter_read);
 					play_lower_part = EEReadByte(iter_read+1);
 					play_upper_part = EEReadByte(iter_read+2);
-//  					if(play_lower_part == low){
-//  						PORTD |= 0x01;
-//  					}
-//  					if(play_upper_part == up){
-//  						PORTD |= 0x02;
-//  					}
 					//decode the saved info
-					iter_note=play_upper_part;
-					iter_note=iter_note<<8;
-					iter_note = play_lower_part | iter_note;
-					//iter_note = 400;
+					iter_note = play_lower_part | (play_upper_part << 8);
 					//set eepnote
 					eep_note = play_note_number;
 					
-					uint16_t iter;
+					int iter;
 					if(eep_note==1)
 					{
 						iter=0;
@@ -767,17 +727,12 @@ int main(void)
 					}
 					else if (eep_note==13)
 					{
-// 						iter=0;
-// 						for(iter=0;iter<iter_note;iter++)
-// 						{
-// 							//silence
-// //  							int dummy;
-// //  							for(dummy = 0; dummy < 15; dummy++){}
-// 							
-// 							PORTC=0x00;
-// 						}
-						PORTC = 0x00;
-						_delay_ms(iter_note/1.6);
+						iter=0;
+						for(iter=0;iter<iter_note;iter++)
+						{
+							//silence
+							PORTC=0x00;
+						}
 					}
 					
 					
@@ -786,7 +741,10 @@ int main(void)
 				
 				
 				//toggle mode to normal play after playing
-				mode=~mode;
+				if(iter_read==endd)
+				{
+					mode=~mode;
+				}	
 				
 			}
 			
@@ -795,5 +753,6 @@ int main(void)
 	}
 			
 }
+
 
 
