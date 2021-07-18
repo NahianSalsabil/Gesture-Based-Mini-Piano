@@ -68,6 +68,7 @@ volatile int recording = 0; //recording off
 volatile int playlist[tot_playlist_size]; // array to keep each tunes end address, address starts from 0
 volatile int low = 0;
 volatile int up = 0;
+volatile int not_failed=1;
 
 ISR(INT0_vect)
 {
@@ -79,13 +80,16 @@ ISR(INT1_vect){
 	if(recording==1){
 		playlist[current_tune_index] = octave;
 		playlist[current_tune_index+1] = end_address_of_tune;
-		current_tune_index = current_tune_index + 2;
-		tot_saved_tunes++;
+		if(not_failed==1)
+		{
+			current_tune_index = current_tune_index + 2;
+			tot_saved_tunes++;
+		}
 		recording = 0;   //recording mode off
 	}
 	else if(recording==0){
 		recording = 1;   //recording mode on
-		
+		not_failed=1;
 	}
 }
 
@@ -158,13 +162,13 @@ int main(void)
 	/* Replace with your application code */
 	mode=0b00000000; //init to normal playing mode
 	DDRA=0x00;
-	DDRB=0x00;
+	DDRB=0x04;
 	DDRD=0b11110000;
 	//DDRC = 0xFF;
-	
+	PORTD &= 0b00001111;
 	//Lcd4_Init();
 	int previous_note = 0x00;
-	int current_note = 0xFF;
+	int current_note = 0x00;
 	unsigned int duration_count = 0;
 	unsigned int upper_part = 0;
 	unsigned int lower_part = 0;
@@ -188,6 +192,10 @@ int main(void)
 	
 	mode=0b00000000; //init to normal playing mode
 	recording=0;
+	curr_playing = 0;
+	current_tune_index = 0;
+	tot_saved_tunes = 0;
+	not_failed=1;
 	
 	EEOpen();
 
@@ -196,7 +204,16 @@ int main(void)
 		//Lcd4_Clear();
 		if(!mode) //normal play
 		{
-
+			PORTB |= 0b00000100;
+			PORTD|=0b00010000;
+			if(recording)
+			{
+				PORTD |= 0b00100000;
+			}
+			else
+			{
+				PORTD &= 0b11011111;
+			}
 			if((PINA & 0b00000001)==0x00)
 			{
 				//PORTC=0b00000001;
@@ -212,11 +229,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
 						//_delay_ms(1000);
-						EEWriteByte(address+1,lower_part);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
 						//_delay_ms(1000);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
  						low = lower_part;
  						up = upper_part;
 						//_delay_ms(1000);
@@ -247,9 +273,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						EEWriteByte(address+1,lower_part);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
 						address = address + 3;
 						end_address_of_tune = address - 1;
 					
@@ -274,9 +311,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						EEWriteByte(address+1,lower_part);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
 						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
@@ -302,9 +350,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						EEWriteByte(address+1,lower_part);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
 						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
@@ -329,9 +388,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						EEWriteByte(address+1,lower_part);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
 						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
@@ -358,9 +428,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						EEWriteByte(address+1,lower_part);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
 						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
@@ -386,9 +467,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						EEWriteByte(address+1,lower_part);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
 						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
@@ -414,9 +506,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						EEWriteByte(address+1,lower_part);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
 						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
@@ -442,9 +545,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						EEWriteByte(address+1,lower_part);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
 						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
@@ -470,9 +584,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						EEWriteByte(address+1,lower_part);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
 						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
@@ -498,9 +623,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						EEWriteByte(address+1,lower_part);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
 						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
@@ -526,9 +662,20 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-						EEWriteByte(address,previous_note);
-						EEWriteByte(address+1,lower_part);
-						EEWriteByte(address+2,upper_part);
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
+						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
 						_delay_ms(100);
 						address = address + 3;
 						end_address_of_tune = address - 1;
@@ -545,7 +692,7 @@ int main(void)
 			else
 			{
 				//PORTD=PORTD & 0b11101111;
-				PORTC &= 0b01111111;
+				//PORTC &= 0b01111111;
 				
 				
 				if(recording){
@@ -565,16 +712,28 @@ int main(void)
 // 						{
 // 							PORTD|=0x02;
 // 						}
-						EEWriteByte(address,previous_note);
+
+						if(!EEWriteByte(address,previous_note))
+						{
+							not_failed=0;
+							PORTD|= 0b01000000;
+							_delay_ms(300);
+						}
 						//_delay_ms(1000);
-						EEWriteByte(address+1,lower_part);
+						if(!EEWriteByte(address+1,lower_part))
+						{
+							not_failed=0;
+						}
 						//_delay_ms(1000);
-						EEWriteByte(address+2,upper_part);
-						//_delay_ms(1000);
+						if(!EEWriteByte(address+2,upper_part))
+						{
+							not_failed=0;
+						}
  						low = lower_part;
  						up = upper_part;
 						address = address + 3;
 						end_address_of_tune = address - 1;
+						PORTD&=0b10111111;
 					
 
 					previous_note = current_note;
@@ -622,12 +781,10 @@ int main(void)
 		}
 		else //record play
 		{
-
+			PORTB |= 0b00000100;
+			PORTD&=0b11101111;
 			if(tot_saved_tunes != 0) // atleast 1 saved tune
 			{
-
-					
-				
 				int start; //starting of saved tune
 				if(curr_playing==0)
 				{
@@ -650,8 +807,27 @@ int main(void)
 				int iter_read;
 				for(iter_read = start ; iter_read <= endd ; iter_read+=3)
 				{
+					if(EEReadByte(iter_read))
+					{
+						PORTD|= 0b10000000;
+						_delay_ms(300);
+						PORTD&=0b01111111;
+						
+					}
+					else
+					{
+						PORTD&=0b01111111;
+					}
 					//read from eeprom
 					play_note_number = EEReadByte(iter_read);
+					if(play_note_number >= 1 && play_note_number <= 13){
+						
+						PORTB &= 0b11111011;
+						
+					}
+					else{
+						PORTB |= 0b00000100;
+					}
 					play_lower_part = EEReadByte(iter_read+1);
 					play_upper_part = EEReadByte(iter_read+2);
 //  					if(play_lower_part == low){
@@ -674,7 +850,7 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note1*play_octave);
+							PLAYNOTE(note1*2);
 						}
 					}
 					else if (eep_note==2)
@@ -682,7 +858,7 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note2*play_octave);
+							PLAYNOTE(note2*2);
 						}
 					}
 					else if (eep_note==3)
@@ -690,7 +866,7 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note3*play_octave);
+							PLAYNOTE(note3*2);
 						}
 					}
 					else if (eep_note==4)
@@ -698,7 +874,7 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note4*play_octave);
+							PLAYNOTE(note4*2);
 						}
 					}
 					else if (eep_note==5)
@@ -706,7 +882,7 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note5*play_octave);
+							PLAYNOTE(note5*2);
 						}
 					}
 					else if (eep_note==6)
@@ -714,7 +890,7 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note6*play_octave);
+							PLAYNOTE(note6*2);
 						}
 					}
 					else if (eep_note==7)
@@ -722,7 +898,7 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note7*play_octave);
+							PLAYNOTE(note7*2);
 						}
 					}
 					else if (eep_note==8)
@@ -730,7 +906,7 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note8*play_octave);
+							PLAYNOTE(note8*2);
 						}
 					}
 					else if (eep_note==9)
@@ -738,7 +914,7 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note9*play_octave);
+							PLAYNOTE(note9*2);
 						}
 					}
 					else if (eep_note==10)
@@ -746,7 +922,7 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note10*play_octave);
+							PLAYNOTE(note10*2);
 						}
 					}
 					else if (eep_note==11)
@@ -754,7 +930,7 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note11*play_octave);
+							PLAYNOTE(note11*2);
 						}
 					}
 					else if (eep_note==12)
@@ -762,33 +938,21 @@ int main(void)
 						iter=0;
 						for(iter=0;iter<iter_note;iter++)
 						{
-							PLAYNOTE(note12*play_octave);
+							PLAYNOTE(note12*2);
 						}
 					}
 					else if (eep_note==13)
 					{
-// 						iter=0;
-// 						for(iter=0;iter<iter_note;iter++)
-// 						{
-// 							//silence
-// //  							int dummy;
-// //  							for(dummy = 0; dummy < 15; dummy++){}
-// 							
-// 							PORTC=0x00;
-// 						}
 						PORTC = 0x00;
 						_delay_ms(iter_note/1.6);
 					}
 					
 					
 				}
-				
-				
-				
-				//toggle mode to normal play after playing
-				mode=~mode;
-				
+				//mode=~mode;
 			}
+			//toggle mode to normal play after playing
+			mode=~mode;
 			
 		}
 		
