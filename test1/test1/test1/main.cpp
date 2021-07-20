@@ -45,8 +45,8 @@
 
 #define tot_playlist_size 10
 #define __DELAY_BACKWARD_COMPATIBLE__
-#define SPEAKER_PORT PORTC
-#define SPEAKER_DDR DDRC
+#define SPEAKER_PORT PORTB
+#define SPEAKER_DDR DDRB
 #define SPEAKER_PIN 7
 
 
@@ -59,7 +59,7 @@
 #include "24c64.c"
 
 volatile unsigned char octave = 1;
-volatile unsigned char mode = 0x00; //mode 0 for normal piano play, mode 1 for record play
+volatile unsigned char mode = 0; //mode 0 for normal piano play, mode 1 for record play
 volatile int curr_playing = 0;
 volatile int current_tune_index = 0;
 volatile int tot_saved_tunes = 0;
@@ -72,16 +72,24 @@ volatile int not_failed=1;
 
 ISR(INT0_vect)
 {
-	mode=~mode; //invert mode
+	//mode=~mode; //invert mode
+	if(mode==0)
+	{
+		mode=1;
+	}
+	else
+	{
+		mode=0;
+	}
 }
 
 ISR(INT1_vect){
 	/*PORTD=PORTD  |  0x80;*/
 	if(recording==1){
+		playlist[current_tune_index] = octave;
+		playlist[current_tune_index+1] = end_address_of_tune;
 		if(not_failed==1)
 		{
-			playlist[current_tune_index] = octave;
-			playlist[current_tune_index+1] = end_address_of_tune;
 			current_tune_index = current_tune_index + 2;
 			tot_saved_tunes++;
 		}
@@ -160,9 +168,9 @@ void PLAYNOTE( float frequency)
 int main(void)
 {
 	/* Replace with your application code */
-	mode=0b00000000; //init to normal playing mode
+	mode=0; //init to normal playing mode
 	DDRA=0x00;
-	DDRB=0x04;
+	DDRB=0b10000100;
 	DDRD=0b11110000;
 	//DDRC = 0xFF;
 	PORTD &= 0b00001111;
@@ -173,8 +181,8 @@ int main(void)
 	unsigned int upper_part = 0;
 	unsigned int lower_part = 0;
 	unsigned int address = 0;
-	current_tune_index = 0;
-	//char outstr[20];
+	
+	char outstr[20];
 	
 	
 	int i=0;
@@ -190,7 +198,7 @@ int main(void)
 	
 	sei(); //enable interrupt
 	
-	mode=0b00000000; //init to normal playing mode
+	//mode=0b00000000; //init to normal playing mode
 	recording=0;
 	curr_playing = 0;
 	current_tune_index = 0;
@@ -202,8 +210,20 @@ int main(void)
 	while (1)
 	{
 		//Lcd4_Clear();
-		if(!mode) //normal play
+		if(tot_saved_tunes!=0)
 		{
+			PORTD &= 0b10111111;
+		}
+		else
+		{
+			PORTD |= 0b01000000;
+		}
+		
+		
+		if(mode==0) //normal play
+		{
+			DDRA=0x00;
+			DDRB=0b10000100;
 			PORTB |= 0b00000100;
 			PORTD|=0b00010000;
 			if(recording)
@@ -704,20 +724,12 @@ int main(void)
 						//eeprom write
 						//write previous_note
 						//write count
-// 						if(EEWriteByte(address,previous_note)==0)
-// 						{
-// 							PORTD|=0x01;
-// 						}
-// 						else
-// 						{
-// 							PORTD|=0x02;
-// 						}
 
 						if(!EEWriteByte(address,previous_note))
 						{
 							not_failed=0;
-							PORTD|= 0b01000000;
-							_delay_ms(300);
+							//PORTD|= 0b01000000;
+							//_delay_ms(300);
 						}
 						//_delay_ms(1000);
 						if(!EEWriteByte(address+1,lower_part))
@@ -733,7 +745,7 @@ int main(void)
  						up = upper_part;
 						address = address + 3;
 						end_address_of_tune = address - 1;
-						PORTD&=0b10111111;
+						//PORTD&=0b10111111;
 					
 
 					previous_note = current_note;
@@ -781,183 +793,218 @@ int main(void)
 		}
 		else //record play
 		{
-			PORTB |= 0b00000100;
+			//PORTB |= 0b00000100;
 			PORTD&=0b11101111;
-			if(tot_saved_tunes != 0) // atleast 1 saved tune
-			{
-				int start; //starting of saved tune
-				if(curr_playing==0)
-				{
-					start=0;
-				}
-				else
-				{
-					start=playlist[((curr_playing-1)*2)+1]+1;
-				}
-				int endd=playlist[(curr_playing*2)+1];//ending of saved tune
+			DDRA=0xff;
+			DDRB=0b10011111;
+// 			if((PINA & 0b00000010)==0x00)
+// 			{
+// 				PLAYNOTE(note2 * octave);				
+// 			}
+// 			else if((PINA & 0b00000100)==0x00)
+// 			{				
+// 				PLAYNOTE(note3 * octave);
+// 			}
 
-				int play_octave=playlist[(curr_playing*2)];
-				
-				int eep_note=0; // note to play (numbering 1-13)
-				uint16_t iter_note=0; // how many iterations of that note will be played
-				uint8_t play_note_number;
-				uint8_t play_lower_part = 0;
-				uint8_t play_upper_part = 0;
-				//read eeprom from address start to end
-				int iter_read;
-				for(iter_read = start ; iter_read <= endd ; iter_read+=3)
-				{
-					if(EEReadByte(iter_read))
-					{
-						PORTD|= 0b10000000;
-						_delay_ms(300);
-						PORTD&=0b01111111;
-						
-					}
-					else
-					{
-						PORTD&=0b01111111;
-					}
-					//read from eeprom
-					play_note_number = EEReadByte(iter_read);
-					if(play_note_number >= 1 && play_note_number <= 13){
-						
-						PORTB &= 0b11111011;
-						
-					}
-					else{
-						PORTB |= 0b00000100;
-					}
-					play_lower_part = EEReadByte(iter_read+1);
-					play_upper_part = EEReadByte(iter_read+2);
-//  					if(play_lower_part == low){
-//  						PORTD |= 0x01;
-//  					}
-//  					if(play_upper_part == up){
-//  						PORTD |= 0x02;
-//  					}
-					//decode the saved info
-					iter_note=play_upper_part;
-					iter_note=iter_note<<8;
-					iter_note = play_lower_part | iter_note;
-					//iter_note = 400;
-					//set eepnote
-					eep_note = play_note_number;
-					
-					uint16_t iter;
-					if(eep_note==1)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note1*play_octave);
-						}
-					}
-					else if (eep_note==2)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note2*play_octave);
-						}
-					}
-					else if (eep_note==3)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note3*play_octave);
-						}
-					}
-					else if (eep_note==4)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note4*play_octave);
-						}
-					}
-					else if (eep_note==5)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note5*play_octave);
-						}
-					}
-					else if (eep_note==6)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note6*play_octave);
-						}
-					}
-					else if (eep_note==7)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note7*play_octave);
-						}
-					}
-					else if (eep_note==8)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note8*play_octave);
-						}
-					}
-					else if (eep_note==9)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note9*play_octave);
-						}
-					}
-					else if (eep_note==10)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note10*play_octave);
-						}
-					}
-					else if (eep_note==11)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note11*play_octave);
-						}
-					}
-					else if (eep_note==12)
-					{
-						iter=0;
-						for(iter=0;iter<iter_note;iter++)
-						{
-							PLAYNOTE(note12*play_octave);
-						}
-					}
-					else if (eep_note==13)
-					{
-						PORTC = 0x00;
-						//_delay_ms(iter_note/1.6);
-					}
-					
-					
-				}
+			if(1)
+			{
+				//PORTA |= 0b00000100;
+				PLAYNOTE(note3 * octave);
 			}
-			//toggle mode to normal play after playing
-			_delay_ms(1000);
-			mode=~mode;
+			
+// 			for(int ii=0 ; ii<500 ; ii++)
+// 			{
+// 				PLAYNOTE(note1 * 2);
+// 			}
+
+			//PLAYNOTE(note12 * octave);
+
+			
+// 			if(tot_saved_tunes != 0) // atleast 1 saved tune
+// 			{
+// 				int start; //starting of saved tune
+// 				if(curr_playing==0)
+// 				{
+// 					start=0;
+// 				}
+// 				else
+// 				{
+// 					start=playlist[((curr_playing-1)*2)+1]+1;
+// 				}
+// 				int endd=playlist[(curr_playing*2)+1];//ending of saved tune
+// 
+// 				int play_octave=playlist[(curr_playing*2)];
+// 				
+// 				int eep_note=0; // note to play (numbering 1-13)
+// 				uint16_t iter_note=0; // how many iterations of that note will be played
+// 				uint8_t play_note_number;
+// 				uint8_t play_lower_part = 0;
+// 				uint8_t play_upper_part = 0;
+// 				
+// 
+// 				
+// 				
+// 				
+// 				//read eeprom from address start to end
+// 				int iter_read;
+// 				for(iter_read = start ; iter_read <= endd ; iter_read+=3)
+// 				{
+// 					if(EEReadByte(iter_read))
+// 					{
+// 						PORTD|= 0b10000000;
+// 						_delay_ms(300);
+// 						PORTD&=0b01111111;
+// 						
+// 					}
+// 					else
+// 					{
+// 						PORTD&=0b01111111;
+// 					}
+// 					_delay_ms(300);
+// 					//read from eeprom
+// 					play_note_number = EEReadByte(iter_read);
+// 					if(play_note_number >= 1 && play_note_number <= 13){
+// 						
+// 						PORTB &= 0b11111011;
+// 						
+// 					}
+// 					else{
+// 						PORTB |= 0b00000100;
+// 					}
+// 					play_lower_part = EEReadByte(iter_read+1);
+// 					play_upper_part = EEReadByte(iter_read+2);
+// 					//decode the saved info
+// 					iter_note=play_upper_part;
+// 					iter_note=iter_note<<8;
+// 					iter_note = play_lower_part | iter_note;
+// 					//iter_note = 400;
+// 					//set eepnote
+// 					eep_note = play_note_number;
+// 					
+// // 					uint16_t iter;
+// // 					iter=0;
+// // 					for(iter=0;iter<400;iter++)
+// // 					{
+// // 						PLAYNOTE(note1*2);
+// // 					}
+// // 					_delay_ms(700);
+// 					
+// 					
+// // 					if(eep_note==1)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note1*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==2)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note2*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==3)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note3*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==4)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note4*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==5)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note5*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==6)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note6*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==7)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note7*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==8)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note8*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==9)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note9*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==10)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note10*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==11)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note11*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==12)
+// // 					{
+// // 						iter=0;
+// // 						for(iter=0;iter<iter_note;iter++)
+// // 						{
+// // 							PLAYNOTE(note12*2);
+// // 						}
+// // 					}
+// // 					else if (eep_note==13)
+// // 					{
+// // 						PORTC = 0x00;
+// // 						//_delay_ms(iter_note/1.6);
+// // 					}
+// 					
+// 					
+// 				}
+// 				//mode=~mode;
+// 			}
+// 			//toggle mode to normal play after playing
+// 			mode=~mode;
+		
 			
 		}
 		
 	}
 			
 }
+
 
 

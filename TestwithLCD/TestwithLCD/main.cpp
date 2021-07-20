@@ -32,21 +32,23 @@
 #define note9 1397
 #define note10 1480
 #define note11 1568
-#define note12 1630    
+#define note12 1630   
 
-// #define D4 eS_PORTD4
-// #define D5 eS_PORTD5
-// #define D6 eS_PORTD6
-// #define D7 eS_PORTD7
-// #define RS eS_PORTC5
-// #define EN eS_PORTC6      
+ 
+
+#define D4 eS_PORTD4
+#define D5 eS_PORTD5
+#define D6 eS_PORTD6
+#define D7 eS_PORTD7
+#define RS eS_PORTC6
+#define EN eS_PORTC7     
 
 
 
 #define tot_playlist_size 10
 #define __DELAY_BACKWARD_COMPATIBLE__
-#define SPEAKER_PORT PORTC
-#define SPEAKER_DDR DDRC
+#define SPEAKER_PORT PORTB
+#define SPEAKER_DDR DDRB
 #define SPEAKER_PIN 7
 
 
@@ -54,9 +56,11 @@
 #include <util/delay.h>
 #include <stdlib.h>
 #include <avr/interrupt.h>
-//#include "lcd.h"
+#include "lcd.h"
 #include "24c64.h"
 #include "24c64.c"
+
+
 
 volatile unsigned char octave = 1;
 volatile unsigned char mode = 0x00; //mode 0 for normal piano play, mode 1 for record play
@@ -164,9 +168,14 @@ int main(void)
 	DDRA=0x00;
 	DDRB=0x04;
 	DDRD=0b11110000;
-	//DDRC = 0xFF;
+	DDRC |= 0b11000000;
 	PORTD &= 0b00001111;
-	//Lcd4_Init();
+	
+// 	Lcd4_Init();
+// 	Lcd4_Set_Cursor(0,1);
+// 	char hellostr[]=" hello";
+// 	Lcd4_Write_String(hellostr);
+	
 	int previous_note = 0x00;
 	int current_note = 0x00;
 	unsigned int duration_count = 0;
@@ -175,6 +184,7 @@ int main(void)
 	unsigned int address = 0;
 	current_tune_index = 0;
 	//char outstr[20];
+	
 	
 	
 	int i=0;
