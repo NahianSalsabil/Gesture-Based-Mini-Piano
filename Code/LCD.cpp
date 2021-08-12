@@ -1,3 +1,5 @@
+//This cpp file is for second ATmega32 Microcontroller connected with LCD.
+
 #ifndef F_CPU
 #define F_CPU 16000000UL // 16 MHz clock speed
 #endif

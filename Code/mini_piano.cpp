@@ -1,9 +1,4 @@
-/*
- * miniPiano.cpp
- *
- * Created: 17-Jun-21 11:21:48 AM
- * Author : Adrita, Nahian, Rittik
- */ 
+// This cpp file is for the main ATmega32 Microcontroller.
 
 //IR: portA all pins, portB 0-3
 //speaker: portC 7
